@@ -1,0 +1,87 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Prezi webcam controller proof of concept</title>
+
+
+
+
+</head>
+
+<body>
+
+<h2 style="text-align: center;">Wait for the prezi to load, allow webcam acces then swipe your hands in front of the webcam to advance the prezi</h2>
+<div id="prezi-container"></div>
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="http://prezi.github.io/prezi-player/lib/PreziPlayer/prezi_player.js"></script>
+<script type="text/javascript" src="js/webcam.js"></script>
+
+<script type="text/javascript">
+var step = 0;
+var moving = false;
+
+function next() {
+    if (!moving) {
+        step += 1;
+        if (step >= player.getStepCount()) {
+            step = player.getStepCount() - 1
+        }
+        player.toStep(step);
+        moving = true;
+        setTimeout(function () {
+            moving = false
+        }, 400)
+    }
+}
+
+function prev() {
+    if (!moving) {
+        if (step >0 ) {
+            step--;
+        }
+        player.toStep(step);
+        moving = true;
+        setTimeout(function () {
+            moving = false
+        }, 400)
+    }
+}
+
+var init = function () {
+    $("body").bind("webcamSwipeLeft", prev);
+    $("body").bind("webcamSwipeRight", next);
+    player.on("statusChange", function () {
+        if (player.getStatus() == PreziPlayer.STATUS_CONTENT_READY) {
+            window.initWebcamHandler();
+            console.log("initialized")
+        }
+    })
+};
+window.onload = function () {
+    var e = document.createElement("div"),
+        c = document.createElement("script"),
+        a = document.createElement("script"),
+        b;
+    b = function () {
+        e.id = "prezi_player_ufnrer-swszq";
+        a.innerHTML = "var player = new PreziPlayer('" + e.id + "', {preziId: 'dgoerw_6qdxf', width: '540', height: '320', controls:true});";
+        $("#prezi-container").append(e);
+        $("#prezi-container").append(a)
+    };
+    if (!window.PreziPlayer) {
+        c.src = "http://prezi.github.io/prezi-player/lib/prezi_player.js";
+        $("#prezi-container").append(c);
+        c.onload = b
+    } else {
+        b()
+    }
+    init()
+};
+</script>
+
+</body>
+</html>
